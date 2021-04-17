@@ -13,11 +13,24 @@ def main(cfg):
     PREDICTION = cfg["COLUMNS"]["PREDICTION"]
     MODEL_PATH = path.Path(cfg["MODEL"]["FilePath"])
     SUBMISSION_FILE = path.Path(cfg["SUBMISSION"]["FilePath"])
-    # do something with data
-    X = pd.read_csv(f'{DATA_FOLDER}/{cfg["DATA"]["UsersFile"]}')
-    # model = joblib.load(MODEL_PATH)
-    submission = X[[USER_ID]].copy()
-    submission[PREDICTION] = np.ones(len(submission)).astype(np.int32)
+
+    funnel = pd.read_csv(f'{DATA_FOLDER}/{cfg["DATA"]["UsersFile"]}').set_index('client_id')
+    client = pd.read_csv(f'{DATA_FOLDER}/{cfg["DATA"]["SocdemFile"]}').set_index('client_id')
+
+    drop_columns = []
+    drop_columns.extend(cfg['COLUMNS']['FUNNEL_DROP_FEATS'].split(','))
+    drop_columns.extend(cfg['COLUMNS']['CLIENT_DROP_FEATS'].split(','))
+
+    pd_X = funnel.join(client)
+    pd_X.drop(drop_columns, axis=1, inplace=True)
+
+    model = joblib.load(MODEL_PATH)
+    pred = (model.predict_proba(pd_X)[:, 1] > 0.5).astype(np.int32)
+
+    submission = pd.DataFrame({
+        USER_ID: pd_X.index,
+        PREDICTION: pred
+    })
     submission.to_csv(SUBMISSION_FILE, index=False)
 
 
