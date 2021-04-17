@@ -28,14 +28,12 @@ RUN curl -sLo ~/miniconda.sh -O  https://repo.continuum.io/miniconda/Miniconda3-
 
 ENV PATH=/usr/conda/bin:$PATH
 
-RUN conda install -y -c pytorch \
-    torchvision \
+RUN conda update -n base -c defaults conda
+
+RUN conda install -y -c \
     numpy scipy pandas scikit-learn joblib tqdm ipython pip cython numba && \
-    pip install statsmodels pqdict xlearn ml_metrics tsfresh mlxtend h5py tempita && \
     pip install xgboost lightgbm catboost && \
-    pip install tensorflow && \
-    pip install keras \
-    && conda clean -ya
+    conda clean -ya
 
 COPY ./requirements.txt requirements.txt
 RUN pip install -r requirements.txt \

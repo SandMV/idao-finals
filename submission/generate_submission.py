@@ -15,11 +15,9 @@ def main(cfg):
     SUBMISSION_FILE = path.Path(cfg["SUBMISSION"]["FilePath"])
     # do something with data
     X = pd.read_csv(f'{DATA_FOLDER}/{cfg["DATA"]["UsersFile"]}')
-    model = joblib.load(MODEL_PATH)
-    
+    # model = joblib.load(MODEL_PATH)
     submission = X[[USER_ID]].copy()
-    # submission[PREDICTION] = np.random.choice([0, 1], len(submission))
-    submission[PREDICTION] = model.predict(X)
+    submission[PREDICTION] = np.ones(len(submission)).astype(np.int32)
     submission.to_csv(SUBMISSION_FILE, index=False)
 
 
