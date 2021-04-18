@@ -248,7 +248,7 @@ def create_aggregates_amount_by(group, by):
     return features
 
 
-def create_transaction_features(name, group):
+def light_features(name, group):
     info = {'client_id': name}
 
     group = group.sort_values(by='tran_time')
@@ -261,6 +261,7 @@ def create_transaction_features(name, group):
     group['days_before'] = (group['tran_time'] - tran_time_max).dt.days
 
     info['num_weekofyear'] = group['tran_time'].dt.isocalendar().week.nunique()
+    info['weekofyear_last'] = group['tran_time'].dt.isocalendar().week.iloc[-1]
 
     info['num_days_tran_diff'] = (tran_time_max - tran_time_min).days
     info['num_days_tran_uniq'] = group['tran_time_day_offset'].nunique()
@@ -283,6 +284,7 @@ def create_transaction_features(name, group):
 
     amnt = group['tran_amt_rur']
 
+    info['amnt_sum'] = amnt.sum()
     info['amnt_mean'] = amnt.mean()
     info['amnt_max'] = amnt.max()
     info['amnt_std'] = amnt.std()
@@ -303,17 +305,31 @@ def create_transaction_features(name, group):
     info['amnt_diff_q10'], info['amnt_diff_q50'], info['amnt_diff_q95'] = \
         amnt_diff.quantile([0.1, 0.5, 0.95])
 
-    info['num_cards'] = group['card_id'].nunique()
+    info['amnt_sum_per_week'] = info['amnt_sum'] / info['num_weekofyear']
+    info['amnt_sum_per_day'] = info['amnt_sum'] / info['num_days_tran_uniq']
+    info['amnt_sum_per_period'] = info['amnt_sum'] / info['num_days_tran_diff']
 
-    # info.update(create_aggregates_amount_by(group, by='mcc_cd'))
-    # info.update(create_aggregates_amount_by(group, by='mcc_category'))
-    # info.update(create_aggregates_amount_by(group, by='txn_comment_1_cat'))
-    # info.update(create_aggregates_amount_by(group, by='txn_comment_2_cat'))
+    info['num_cards'] = group['card_id'].nunique()
 
     return info
 
 
-def load_trxn(trxn_file: str, dict_mcc_file: str, rarity_thr: float = 1.) -> pd.DataFrame:
+def heavy_features(name, group):
+    info = {'client_id': name}
+    group = group.sort_values(by='tran_time')
+
+    info.update(create_aggregates_amount_by(group, by='mcc_cd'))
+    info.update(create_aggregates_amount_by(group, by='mcc_category'))
+    info.update(create_aggregates_amount_by(group, by='txn_comment_1_cat'))
+    info.update(create_aggregates_amount_by(group, by='txn_comment_2_cat'))
+
+    return info
+
+def load_trxn(
+        trxn_file: str,
+        dict_mcc_file: str,
+        light_type: bool = True,
+        rarity_thr: float = 1.) -> pd.DataFrame:
     dict_mcc = pd.read_csv(dict_mcc_file, sep=',')
     dict_mcc['mcc_category'] = dict_mcc['brs_mcc_group'].astype('category').cat.codes
 
@@ -329,7 +345,8 @@ def load_trxn(trxn_file: str, dict_mcc_file: str, rarity_thr: float = 1.) -> pd.
     df.loc[df['mcc_cd'].isin(MCC_CODES_RARE), 'mcc_cd'] = -1
 
     df_grouped = df.groupby('client_id')
-    df_features = starmap(create_transaction_features, df_grouped)
+    map_fun = light_features if light_type else heavy_features
+    df_features = starmap(map_fun, df_grouped)
     df_features = pd.DataFrame(df_features)
 
     counts = df_features.isna().sum(axis=0) / df_features.shape[0]
@@ -344,4 +361,4 @@ def load_trxn(trxn_file: str, dict_mcc_file: str, rarity_thr: float = 1.) -> pd.
 
     df_features.drop(columns=columns, inplace=True)
 
-    return df_features.set_index('client_id')
+    return df_features.set_index('client_id').sort_index()

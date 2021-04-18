@@ -2,13 +2,11 @@ import configparser
 import pathlib as path
 
 from dataset_loader import load_dataset
-import lightgbm as lgb
 import numpy as np
 import pandas as pd
 
 import json
-import catboost as cbm
-import joblib
+import lightgbm as lgb
 
 def main(cfg):
     # parse config
@@ -27,7 +25,7 @@ def main(cfg):
     for d in state_dict['models']:
         model = d['model']
         thr = d['model_thr']
-        probs = cbm.CatBoostClassifier().load_model(model).predict(ds, prediction_type='Probability')[:, 1]
+        probs = lgb.Booster(model_file=model).predict(ds)
         preds += probs > thr
 
     submission = pd.DataFrame({
