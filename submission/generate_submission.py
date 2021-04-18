@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 
 import json
+import catboost as cbm
 import joblib
 
 def main(cfg):
@@ -26,7 +27,7 @@ def main(cfg):
     for d in state_dict['models']:
         model = d['model']
         thr = d['model_thr']
-        probs = lgb.Booster(model_file=model).predict(ds)
+        probs = cbm.CatBoostClassifier().load_model(model).predict(ds, prediction_type='Probability')[:, 1]
         preds += probs > thr
 
     submission = pd.DataFrame({

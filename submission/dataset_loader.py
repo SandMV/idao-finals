@@ -11,6 +11,9 @@ import numpy as np
 
 from os import path
 
+TARGET_COLUMNS = ['sale_flg', 'sale_amount', 'contacts']
+
+
 def trim_to_meta(ds: pd.DataFrame, columns_meta: List[str]) -> pd.DataFrame:
     ds_c = set(ds.columns.to_list())
     meta_c = set(columns_meta)
@@ -27,7 +30,7 @@ def trim_to_meta(ds: pd.DataFrame, columns_meta: List[str]) -> pd.DataFrame:
 
 def load_dataset(cfg: ConfigParser, in_test=False, columns_meta: List[str] = None) \
         -> Tuple[np.ndarray, Union[pd.DataFrame, None]]:
-    ds, trg = load_funnel(cfg['DATA']['Users'], in_test)
+    ds = load_funnel(cfg['DATA']['Users'], in_test)
 
     if path.exists(cfg['DATA']['Socdem']):
         socdem = load_client(cfg['DATA']['Socdem'])
@@ -55,7 +58,13 @@ def load_dataset(cfg: ConfigParser, in_test=False, columns_meta: List[str] = Non
 
     ds.fillna(0, inplace=True)
 
+    target_c = None
+    if not in_test:
+        target_c = ds[TARGET_COLUMNS]
+        target_c.sale_amount.fillna(0, inplace=True)
+        ds.drop(columns=TARGET_COLUMNS, inplace=True)
+
     if in_test and columns_meta:
         ds = trim_to_meta(ds, columns_meta)
 
-    return ds, trg
+    return ds, target_c

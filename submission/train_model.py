@@ -4,9 +4,11 @@ import logging
 from operator import itemgetter
 from dataset_loader import load_dataset
 from sklearn.model_selection import KFold
+from sklearn.metrics import roc_auc_score
 import numpy as np
 
 import lightgbm as lgb
+import catboost as cbm
 import json
 
 logging.basicConfig(format='%(asctime)s %(message)s', filename='training.log', level=logging.DEBUG)
@@ -23,7 +25,7 @@ def find_threshold(booster, dts, gains, n_calls):
     def mean_income(labels, gains, n_calls):
         return (labels * (gains - 4000 * n_calls)).mean()
 
-    scores = np.array(booster.predict(dts))
+    scores = np.array(booster.predict(data=dts, prediction_type='Probability')[:, 1])
     thrs = np.linspace(0, 1, 1000)
     return max(
         ((t, mean_income(scores > t, gains, n_calls)) for t in thrs),
@@ -46,11 +48,14 @@ def main(cfg):
     print('Columns:')
     print('\n'.join(dataset.columns.to_list()))
 
+    dataset.to_csv('train_ds.csv', sep=',')
+    trg.to_csv('train_trg.csv', sep=',')
+
     folds = [(tr, te) for tr, te in kfold.split(dataset, trg.sale_flg)]
-    X_train = lgb.Dataset(
-        data=dataset,
-        label=trg.sale_flg.to_numpy().astype(np.int32),
-    )
+    # X_train = cbm.Pool(
+    #     data=dataset,
+    #     label=trg.sale_flg.to_numpy().astype(np.int32),
+    # )
 
     LGM_PARAMS = {
         'objective': 'binary',
@@ -63,18 +68,18 @@ def main(cfg):
         'num_leaves': 256,
     }
 
-    eval_hist = lgb.cv(
-        LGM_PARAMS, X_train,
-        show_stdv=True,
-        verbose_eval=True,
-        num_boost_round=1000,
-        return_cvbooster=True,
-        early_stopping_rounds = 50,
-        folds=folds
-    )
+    # eval_hist = cbm.cv(
+    #     LGM_PARAMS, X_train,
+    #     show_stdv=True,
+    #     verbose_eval=True,
+    #     num_boost_round=1000,
+    #     return_cvbooster=True,
+    #     early_stopping_rounds = 50,
+    #     folds=folds
+    # )
 
-    print(f'Mean AUC: {eval_hist["auc-mean"][-1]:4.3f}')
-    boosters = eval_hist.pop('cvbooster', None).boosters
+    # print(f'Mean AUC: {eval_hist["auc-mean"][-1]:4.3f}')
+    # boosters = eval_hist.pop('cvbooster', None).boosters
 
     state_dict = {
         'columns_meta': dataset.columns.to_list(),
@@ -84,15 +89,30 @@ def main(cfg):
     gains = trg[cfg['COLUMNS']['GAINS']].to_numpy()
     n_calls = trg[cfg['COLUMNS']['N_CALLS']].to_numpy()
 
-    for i, (b, (tr, te)) in enumerate(zip(boosters, folds)):
+    for i, (tr, te) in enumerate(folds):
+        b = cbm.CatBoostClassifier(
+            depth=6,
+            iterations=1000,
+            learning_rate=0.05,
+            subsample=0.7,
+            best_model_min_trees=100,
+            eval_metric='AUC'
+        ).fit(dataset.iloc[tr], trg.sale_flg.iloc[tr])
         model_name = f'model_{i}.bst'
         model_thr, model_sc = find_threshold(b, dataset.iloc[te], gains[te], n_calls[te])
         state_dict['models'].append({
             'model': model_name,
-            'model_thr': model_thr
+            'model_thr': model_thr,
+            'model_sc': model_sc,
+            'model_auc': roc_auc_score(
+                trg.sale_flg.iloc[te], b.predict(dataset.iloc[te], prediction_type='Probability')[:, 1]
+            )
         })
-        print(f'Found threshold {model_thr:4.3f} with score {model_sc:10.3f} for model with index {i}')
         b.save_model(model_name)
+
+    for md in state_dict['models']:
+        print(f'Found threshold {md["model_thr"]:4.3f} with score {md["model_sc"]:10.3f} for model {md["model"]}')
+        print(f'AUC {md["model_auc"]} for model {md["model"]}')
 
     with open('state_dict.json', mode='w') as out:
         json.dump(state_dict, out)

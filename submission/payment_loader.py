@@ -22,6 +22,10 @@ def load_payment(payment_file: str) -> pd.DataFrame:
 
     feats = pd.concat(features_pool, axis=1).sort_index()
     feats.fillna(0, inplace=True)
-    feats['pmnts_name_sum_rur_count_Pension_receipts'] = feats['pmnts_name_sum_rur_count_Pension_receipts'].astype(int)
-    feats['pmnts_name_sum_rur_count_Salary_receipts'] = feats['pmnts_name_sum_rur_count_Salary_receipts'].astype(int)
+    if 'pmnts_name_sum_rur_count_Pension_receipts' in feats.columns:
+        feats['pmnts_name_sum_rur_count_Pension_receipts'] = \
+            feats['pmnts_name_sum_rur_count_Pension_receipts'].astype(int)
+    if 'pmnts_name_sum_rur_count_Salary_receipts' in feats.columns:
+        feats['pmnts_name_sum_rur_count_Salary_receipts'] = \
+            feats['pmnts_name_sum_rur_count_Salary_receipts'].astype(int)
     return feats

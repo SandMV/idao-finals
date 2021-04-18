@@ -2,7 +2,7 @@ import pandas as pd
 
 
 def load_client(client_data: str) -> pd.DataFrame:
-    client = pd.read_csv(client_data, sep=',').set_index('client_id').sort_index()
+    client = pd.read_csv(client_data, sep=',')
     client.education.fillna('MISSING', inplace=True)
     client.job_type.fillna('MISSING', inplace=True)
     client.citizenship.fillna('MISSING', inplace=True)
@@ -15,4 +15,4 @@ def load_client(client_data: str) -> pd.DataFrame:
         client,
         columns=['education', 'region', 'city', 'gender', 'citizenship', 'job_type']
     )
-    return client
+    return client.set_index('client_id').sort_index()
