@@ -26,11 +26,7 @@ def main(cfg):
     for d in state_dict['models']:
         model = d['model']
         thr = d['model_thr']
-        probs = joblib.load(model).predict_proba(ds)
-        if probs.shape[1] == 2:
-            probs = probs[:, 1]
-        else:
-            probs = probs[:, 0]
+        probs = lgb.Booster(model_file=model).predict(ds)
         preds += probs > thr
 
     submission = pd.DataFrame({

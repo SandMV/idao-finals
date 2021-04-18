@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from multiprocessing import Pool
+from itertools import starmap
 from operator import or_
 from functools import reduce
 
@@ -305,10 +305,10 @@ def create_transaction_features(name, group):
 
     info['num_cards'] = group['card_id'].nunique()
 
-    info.update(create_aggregates_amount_by(group, by='mcc_cd'))
-    info.update(create_aggregates_amount_by(group, by='mcc_category'))
-    info.update(create_aggregates_amount_by(group, by='txn_comment_1_cat'))
-    info.update(create_aggregates_amount_by(group, by='txn_comment_2_cat'))
+    # info.update(create_aggregates_amount_by(group, by='mcc_cd'))
+    # info.update(create_aggregates_amount_by(group, by='mcc_category'))
+    # info.update(create_aggregates_amount_by(group, by='txn_comment_1_cat'))
+    # info.update(create_aggregates_amount_by(group, by='txn_comment_2_cat'))
 
     return info
 
@@ -329,9 +329,8 @@ def load_trxn(trxn_file: str, dict_mcc_file: str, rarity_thr: float = 1.) -> pd.
     df.loc[df['mcc_cd'].isin(MCC_CODES_RARE), 'mcc_cd'] = -1
 
     df_grouped = df.groupby('client_id')
-    with Pool(processes=1) as pool:
-        df_features = pool.starmap(create_transaction_features, df_grouped, chunksize=100)
-        df_features = pd.DataFrame(df_features)
+    df_features = starmap(create_transaction_features, df_grouped)
+    df_features = pd.DataFrame(df_features)
 
     counts = df_features.isna().sum(axis=0) / df_features.shape[0]
     columns = df_features.columns[counts >= rarity_thr]
