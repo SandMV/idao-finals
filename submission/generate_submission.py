@@ -1,35 +1,41 @@
 import configparser
 import pathlib as path
 
+from dataset_loader import load_dataset
+import lightgbm as lgb
 import numpy as np
 import pandas as pd
-import joblib
 
+import json
+import joblib
 
 def main(cfg):
     # parse config
-    DATA_FOLDER = path.Path(cfg["DATA"]["DatasetPath"])
     USER_ID = cfg["COLUMNS"]["USER_ID"]
     PREDICTION = cfg["COLUMNS"]["PREDICTION"]
-    MODEL_PATH = path.Path(cfg["MODEL"]["FilePath"])
     SUBMISSION_FILE = path.Path(cfg["SUBMISSION"]["FilePath"])
 
-    funnel = pd.read_csv(f'{DATA_FOLDER}/{cfg["DATA"]["UsersFile"]}').set_index('client_id')
-    client = pd.read_csv(f'{DATA_FOLDER}/{cfg["DATA"]["SocdemFile"]}').set_index('client_id')
+    with open('state_dict.json', mode='r') as inp:
+        state_dict = json.load(inp)
 
-    drop_columns = []
-    drop_columns.extend(cfg['COLUMNS']['FUNNEL_DROP_FEATS'].split(','))
-    drop_columns.extend(cfg['COLUMNS']['CLIENT_DROP_FEATS'].split(','))
+    columns_meta = state_dict['columns_meta']
+    ds, *_ = load_dataset(cfg, True, columns_meta)
 
-    pd_X = funnel.join(client)
-    pd_X.drop(drop_columns, axis=1, inplace=True)
-
-    model = joblib.load(MODEL_PATH)
-    pred = (model.predict_proba(pd_X)[:, 1] > 0.5).astype(np.int32)
+    models_cnt = len(state_dict['models'])
+    preds = np.zeros(len(ds))
+    for d in state_dict['models']:
+        model = d['model']
+        thr = d['model_thr']
+        probs = joblib.load(model).predict_proba(ds)
+        if probs.shape[1] == 2:
+            probs = probs[:, 1]
+        else:
+            probs = probs[:, 0]
+        preds += probs > thr
 
     submission = pd.DataFrame({
-        USER_ID: pd_X.index,
-        PREDICTION: pred
+        USER_ID: ds.index,
+        PREDICTION: (preds >= models_cnt // 2).astype(np.int32)
     })
     submission.to_csv(SUBMISSION_FILE, index=False)
 

@@ -3,3 +3,99 @@
 2021-04-17 18:00:41,935 model was trained
 2021-04-17 18:03:39,838 model was trained
 2021-04-17 18:05:52,501 model was trained
+2021-04-17 18:10:19,801 model was trained
+2021-04-17 18:15:16,374 model was trained
+2021-04-17 18:24:59,149 model was trained
+2021-04-17 18:26:49,170 model was trained
+2021-04-17 23:00:43,379 Dataset shape: (21498, 834)
+2021-04-17 23:02:53,395 Dataset shape: (21498, 834)
+2021-04-17 23:04:06,822 Dataset shape: (21498, 834)
+2021-04-17 23:04:09,591 Mean AUC: 0.919
+2021-04-17 23:04:45,796 Dataset shape: (21498, 834)
+2021-04-17 23:04:48,497 Mean AUC: 0.919
+2021-04-17 23:06:03,264 Dataset shape: (21498, 834)
+2021-04-17 23:06:06,175 Mean AUC: 0.919
+2021-04-17 23:06:48,483 Dataset shape: (21498, 834)
+2021-04-17 23:06:51,338 Mean AUC: 0.919
+2021-04-17 23:06:51,351 [('ololo', 'auc', 0.9149694420568308, True)]
+2021-04-17 23:07:30,426 Dataset shape: (21498, 834)
+2021-04-17 23:07:33,294 Mean AUC: 0.919
+2021-04-17 23:08:31,308 Dataset shape: (21498, 834)
+2021-04-17 23:08:34,062 Mean AUC: 0.919
+2021-04-17 23:10:25,897 Dataset shape: (21498, 834)
+2021-04-17 23:10:28,634 Mean AUC: 0.919
+2021-04-17 23:11:45,081 Dataset shape: (21498, 834)
+2021-04-17 23:11:47,903 Mean AUC: 0.919
+2021-04-17 23:16:10,594 Dataset shape: (21498, 834)
+2021-04-17 23:16:13,168 Mean AUC: 0.919
+2021-04-17 23:18:17,624 Dataset shape: (21498, 834)
+2021-04-17 23:18:20,476 Mean AUC: 0.919
+2021-04-17 23:18:48,816 Dataset shape: (21498, 834)
+2021-04-17 23:18:51,833 Mean AUC: 0.919
+2021-04-17 23:20:12,043 Dataset shape: (21498, 834)
+2021-04-17 23:20:14,830 Mean AUC: 0.919
+2021-04-17 23:20:53,171 Dataset shape: (21498, 834)
+2021-04-17 23:20:55,843 Mean AUC: 0.919
+2021-04-17 23:21:32,464 Dataset shape: (21498, 834)
+2021-04-17 23:21:35,282 Mean AUC: 0.919
+2021-04-17 23:21:35,496 Found threshold 0.140 for model with index 0
+2021-04-17 23:21:35,699 Found threshold 0.163 for model with index 1
+2021-04-17 23:21:35,902 Found threshold 0.192 for model with index 2
+2021-04-17 23:21:36,107 Found threshold 0.193 for model with index 3
+2021-04-17 23:21:36,312 Found threshold 0.227 for model with index 4
+2021-04-17 23:22:01,249 Dataset shape: (21498, 834)
+2021-04-17 23:22:03,933 Mean AUC: 0.919
+2021-04-17 23:22:04,140 Found threshold 0.140 for model with index 0
+2021-04-17 23:22:04,343 Found threshold 0.163 for model with index 1
+2021-04-17 23:22:04,545 Found threshold 0.192 for model with index 2
+2021-04-17 23:22:04,749 Found threshold 0.193 for model with index 3
+2021-04-17 23:22:04,954 Found threshold 0.227 for model with index 4
+2021-04-17 23:22:04,958 model was trained
+2021-04-17 23:27:43,010 Dataset shape: (21498, 2320)
+2021-04-17 23:28:15,893 Mean AUC: 0.921
+2021-04-17 23:28:16,379 Found threshold 0.131 for model with index 0
+2021-04-17 23:28:16,864 Found threshold 0.189 for model with index 1
+2021-04-17 23:28:17,331 Found threshold 0.193 for model with index 2
+2021-04-17 23:28:17,806 Found threshold 0.203 for model with index 3
+2021-04-17 23:28:18,274 Found threshold 0.232 for model with index 4
+2021-04-17 23:28:18,278 model was trained
+2021-04-17 23:29:44,609 Dataset shape: (21498, 834)
+2021-04-17 23:30:07,084 Dataset shape: (21498, 834)
+2021-04-17 23:30:09,913 Mean AUC: 0.919
+2021-04-17 23:30:10,958 model was trained
+2021-04-17 23:36:45,403 Dataset shape: (21498, 2320)
+2021-04-17 23:37:13,575 Mean AUC: 0.921
+2021-04-17 23:37:15,904 model was trained
+2021-04-17 23:51:19,779 Dataset shape: (5, 663)
+2021-04-17 23:52:15,092 Dataset shape: (5, 663)
+2021-04-17 23:52:15,166 Mean AUC: 1.000
+2021-04-17 23:52:15,261 model was trained
+2021-04-17 23:53:47,614 Dataset shape: (5, 29)
+2021-04-17 23:53:47,654 Mean AUC: 1.000
+2021-04-17 23:53:47,740 model was trained
+2021-04-17 23:53:58,119 Dataset shape: (5, 29)
+2021-04-17 23:53:58,162 Mean AUC: 1.000
+2021-04-17 23:53:58,245 model was trained
+2021-04-17 23:56:53,269 Dataset shape: (5, 29)
+2021-04-17 23:56:53,310 Mean AUC: 1.000
+2021-04-17 23:56:53,362 model was trained
+2021-04-18 00:03:24,619 Dataset shape: (5, 29)
+2021-04-18 00:04:50,552 Dataset shape: (5, 29)
+2021-04-18 00:05:37,790 Dataset shape: (5, 29)
+2021-04-18 00:06:29,678 Dataset shape: (5, 29)
+2021-04-18 00:06:33,280 model was trained
+2021-04-18 00:07:13,668 Dataset shape: (5, 29)
+2021-04-18 00:08:28,087 Dataset shape: (5, 29)
+2021-04-18 00:09:47,087 Dataset shape: (5, 29)
+2021-04-18 00:10:25,087 Dataset shape: (5, 29)
+2021-04-18 00:10:43,662 Dataset shape: (5, 29)
+2021-04-18 00:10:53,433 Dataset shape: (5, 29)
+2021-04-18 00:11:18,265 Dataset shape: (5, 29)
+2021-04-18 00:13:04,098 Dataset shape: (5, 29)
+2021-04-18 00:13:07,621 model was trained
+2021-04-18 00:15:08,944 Dataset shape: (5, 29)
+2021-04-18 00:15:12,471 model was trained
+2021-04-18 00:15:26,439 Dataset shape: (5, 29)
+2021-04-18 00:15:30,146 model was trained
+2021-04-18 00:16:59,128 Dataset shape: (5, 29)
+2021-04-18 00:17:02,667 model was trained
