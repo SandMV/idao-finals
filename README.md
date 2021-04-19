@@ -1,5 +1,7 @@
 # IDAO 2021 Finals - example submission
 
+Clone from [here](https://github.com/aguschin/idao_2021_finals)
+
 ## Python version
 Docker image will have python 3.8.5. The `scorer.py` is tested with the same python version. You will need to install Docker and docker-compose to your working machine.
 
